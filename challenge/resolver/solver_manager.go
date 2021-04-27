@@ -14,6 +14,7 @@ import (
 	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/challenge/dns01"
 	"github.com/go-acme/lego/v4/challenge/http01"
+	"github.com/go-acme/lego/v4/challenge/tkauth01"
 	"github.com/go-acme/lego/v4/challenge/tlsalpn01"
 	"github.com/go-acme/lego/v4/log"
 )
@@ -54,6 +55,12 @@ func (c *SolverManager) SetDNS01Provider(p challenge.Provider, opts ...dns01.Cha
 	return nil
 }
 
+// SetTkauthProvider specifies a custom provider p that can solve the given Tkauth challenge.
+func (c *SolverManager) SetTkauthProvider() error {
+	c.solvers[challenge.TKAUTH01] = tkauth01.NewChallenge(c.core, validate)
+	return nil
+}
+
 // Remove Remove a challenge type from the available solvers.
 func (c *SolverManager) Remove(chlgType challenge.Type) {
 	delete(c.solvers, chlgType)
@@ -77,7 +84,7 @@ func (c *SolverManager) chooseSolver(authz acme.Authorization) solver {
 }
 
 func validate(core *api.Core, domain string, chlg acme.Challenge) error {
-	chlng, err := core.Challenges.New(chlg.URL)
+	chlng, err := core.Challenges.NewTkauth(chlg.URL, domain)
 	if err != nil {
 		return fmt.Errorf("failed to initiate challenge: %w", err)
 	}

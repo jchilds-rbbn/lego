@@ -116,5 +116,26 @@ func CreateFlags(defaultPath string) []cli.Flag {
 			Usage: "Set the certificate timeout value to a specific value in seconds. Only used when obtaining certificates.",
 			Value: 30,
 		},
+		cli.BoolFlag{
+			Name:  "tkauth",
+			Usage: "Use the tkauth challenge to solve challenges. Can be mixed with other types of challenges.",
+		},
+		cli.StringFlag{
+			Name:  "tkauth.stipa",
+			Usage: "STI-PA URI for SPC token creation",
+			Value: "https://authenticate-api-stg.iconectiv.com",
+		},
+		cli.StringFlag{
+			Name:  "tkauth.stipa-user",
+			Usage: "STI-PA account username",
+		},
+		cli.StringFlag{
+			Name:  "tkauth.stipa-password",
+			Usage: "STI-PA account password",
+		},
+		cli.StringFlag{
+			Name:  "tkauth.SPC",
+			Usage: "SPC to include in STI-PA token request",
+		},
 	}
 }

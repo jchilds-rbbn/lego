@@ -8,6 +8,7 @@ import (
 	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/challenge/dns01"
 	"github.com/go-acme/lego/v4/challenge/http01"
+	"github.com/go-acme/lego/v4/challenge/tkauth01"
 	"github.com/go-acme/lego/v4/challenge/tlsalpn01"
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/log"
@@ -18,8 +19,8 @@ import (
 )
 
 func setupChallenges(ctx *cli.Context, client *lego.Client) {
-	if !ctx.GlobalBool("http") && !ctx.GlobalBool("tls") && !ctx.GlobalIsSet("dns") {
-		log.Fatal("No challenge selected. You must specify at least one challenge: `--http`, `--tls`, `--dns`.")
+	if !ctx.GlobalBool("http") && !ctx.GlobalBool("tls") && !ctx.GlobalIsSet("dns") && !ctx.GlobalIsSet("tkauth") {
+		log.Fatal("No challenge selected. You must specify at least one challenge: `--http`, `--tls`, `--dns`, `--tkauth` .")
 	}
 
 	if ctx.GlobalBool("http") {
@@ -39,6 +40,11 @@ func setupChallenges(ctx *cli.Context, client *lego.Client) {
 	if ctx.GlobalIsSet("dns") {
 		setupDNS(ctx, client)
 	}
+
+	if ctx.GlobalIsSet("tkauth") {
+		setupTkauth(ctx, client)
+	}
+
 }
 
 func setupHTTPProvider(ctx *cli.Context) challenge.Provider {
@@ -123,4 +129,30 @@ func setupDNS(ctx *cli.Context, client *lego.Client) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func setupTkauth(ctx *cli.Context, client *lego.Client) {
+
+	if !ctx.GlobalIsSet("tkauth.stipa-user") {
+		log.Fatalf("tkauth.stipa-user not set.")
+	}
+	if !ctx.GlobalIsSet("tkauth.stipa-password") {
+		log.Fatalf("tkauth.stipa-password not set.")
+	}
+	if !ctx.GlobalIsSet("tkauth.SPC") {
+		log.Fatalf("tkauth.SPC not set.")
+	}
+
+	tkauth01.SetStiPaUser(ctx.GlobalString("tkauth.stipa-user"))
+	tkauth01.SetStiPaPassword(ctx.GlobalString("tkauth.stipa-password"))
+	tkauth01.SetStiPaUrl(ctx.GlobalString("tkauth.stipa"))
+	tkauth01.SetSPC(ctx.GlobalString("tkauth.SPC"))
+
+	err := client.Challenge.SetTkauthProvider()
+	if err != nil {
+		log.Println("Error create Tkauth Provider ", err)
+	}
+
+	log.Println("Using tkauth challenge")
+
 }

@@ -43,6 +43,7 @@ type Config struct {
 }
 
 func NewConfig(user registration.User) *Config {
+	fmt.Println("This is from the forked module")
 	return &Config{
 		CADirURL:   LEDirectoryProduction,
 		User:       user,
@@ -63,6 +64,7 @@ type CertificateConfig struct {
 // and potentially a custom *x509.CertPool
 // based on the caCertificatesEnvVar environment variable (see the `initCertPool` function).
 func createDefaultHTTPClient() *http.Client {
+
 	return &http.Client{
 		Timeout: 2 * time.Minute,
 		Transport: &http.Transport{
@@ -74,8 +76,9 @@ func createDefaultHTTPClient() *http.Client {
 			TLSHandshakeTimeout:   30 * time.Second,
 			ResponseHeaderTimeout: 30 * time.Second,
 			TLSClientConfig: &tls.Config{
-				ServerName: os.Getenv(caServerNameEnvVar),
-				RootCAs:    initCertPool(),
+				ServerName:         os.Getenv(caServerNameEnvVar),
+				RootCAs:            initCertPool(),
+				InsecureSkipVerify: true,
 			},
 		},
 	}

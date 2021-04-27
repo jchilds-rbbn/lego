@@ -247,6 +247,8 @@ type Challenge struct {
 
 	// https://tools.ietf.org/html/rfc8555#section-8.1
 	KeyAuthorization string `json:"keyAuthorization"`
+
+	TkauthType string `json:"tkauth-type"`
 }
 
 // Identifier the ACME identifier object.

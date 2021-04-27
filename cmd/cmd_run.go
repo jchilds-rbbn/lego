@@ -21,11 +21,12 @@ func createRun() cli.Command {
 			// we require either domains or csr, but not both
 			hasDomains := len(ctx.GlobalStringSlice("domains")) > 0
 			hasCsr := len(ctx.GlobalString("csr")) > 0
+			hasTkauth := ctx.GlobalBool("tkauth")
 			if hasDomains && hasCsr {
 				log.Fatal("Please specify either --domains/-d or --csr/-c, but not both")
 			}
-			if !hasDomains && !hasCsr {
-				log.Fatal("Please specify --domains/-d (or --csr/-c if you already have a CSR)")
+			if !hasDomains && !hasCsr && !hasTkauth {
+				log.Fatal("Please specify --domains/-d (or --csr/-c if you already have a CSR) or --tkauth")
 			}
 			return nil
 		},

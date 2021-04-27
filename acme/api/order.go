@@ -63,3 +63,22 @@ func (o *OrderService) UpdateForCSR(orderURL string, csr []byte) (acme.ExtendedO
 
 	return acme.ExtendedOrder{Order: order}, nil
 }
+
+// New Creates a new order.
+func (o *OrderService) NewForTkauth(SPC string) (acme.ExtendedOrder, error) {
+	var identifiers []acme.Identifier
+	identifiers = append(identifiers, acme.Identifier{Type: "TNAuthList", Value: SPC})
+
+	orderReq := acme.Order{Identifiers: identifiers}
+
+	var order acme.Order
+	resp, err := o.core.post(o.core.GetDirectory().NewOrderURL, orderReq, &order)
+	if err != nil {
+		return acme.ExtendedOrder{}, err
+	}
+
+	return acme.ExtendedOrder{
+		Order:    order,
+		Location: resp.Header.Get("Location"),
+	}, nil
+}

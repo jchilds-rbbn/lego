@@ -20,6 +20,9 @@ const (
 
 	// TLSALPN01 is the "tls-alpn-01" ACME challenge https://tools.ietf.org/html/draft-ietf-acme-tls-alpn-07
 	TLSALPN01 = Type("tls-alpn-01")
+
+	// TKAUTH01 is the "tkauth-01" ACME challenge https://tools.ietf.org/html/draft-ietf-acme-authority-token-tnauthlist-08
+	TKAUTH01 = Type("tkauth-01")
 )
 
 func (t Type) String() string {

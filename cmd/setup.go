@@ -44,10 +44,13 @@ func newClient(ctx *cli.Context, acc registration.User, keyType certcrypto.KeyTy
 	}
 	config.UserAgent = fmt.Sprintf("lego-cli/%s", ctx.App.Version)
 
+	if ctx.GlobalIsSet("skipTLSCheck") {
+		// Disable TLS checking here.
+	}
+
 	if ctx.GlobalIsSet("http-timeout") {
 		config.HTTPClient.Timeout = time.Duration(ctx.GlobalInt("http-timeout")) * time.Second
 	}
-
 	client, err := lego.NewClient(config)
 	if err != nil {
 		log.Fatalf("Could not create client: %v", err)

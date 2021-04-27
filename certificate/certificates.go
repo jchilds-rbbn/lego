@@ -16,6 +16,7 @@ import (
 	"github.com/go-acme/lego/v4/acme/api"
 	"github.com/go-acme/lego/v4/certcrypto"
 	"github.com/go-acme/lego/v4/challenge"
+	"github.com/go-acme/lego/v4/challenge/tkauth01"
 	"github.com/go-acme/lego/v4/log"
 	"github.com/go-acme/lego/v4/platform/wait"
 	"golang.org/x/crypto/ocsp"
@@ -170,7 +171,8 @@ func (c *Certifier) ObtainForCSR(request ObtainForCSRRequest) (*Resource, error)
 		log.Infof("[%s] acme: Obtaining SAN certificate given a CSR", strings.Join(domains, ", "))
 	}
 
-	order, err := c.core.Orders.New(domains)
+	// order, err := c.core.Orders.New(domains)
+	order, err := c.core.Orders.NewForTkauth(tkauth01.GetSPC())
 	if err != nil {
 		return nil, err
 	}

@@ -172,7 +172,7 @@ func (c *Certifier) ObtainForCSR(request ObtainForCSRRequest) (*Resource, error)
 	}
 
 	// order, err := c.core.Orders.New(domains)
-	order, err := c.core.Orders.NewForTkauth(tkauth01.GetSPC())
+	order, err := c.core.Orders.NewForTkauth(tkauth01.GetTNAuthList())
 	if err != nil {
 		return nil, err
 	}

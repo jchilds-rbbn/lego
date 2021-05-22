@@ -22,6 +22,7 @@ var stiPaUsername string
 var stiPaPassword string
 var spc string
 var tnAuthList string
+var fingerPrint string
 
 type ValidateFunc func(core *api.Core, domain string, chlng acme.Challenge) error
 
@@ -97,6 +98,11 @@ func GetSPC() string {
 
 func GetTNAuthList() string {
 	return tnAuthList
+}
+
+
+func SetFingerprint(fp string) {
+	fingerPrint = "SHA256 " + fp
 }
 
 // loginToSTIPA //logs in to the STI PA and returns the access token

@@ -100,6 +100,9 @@ func GetTNAuthList() string {
 	return tnAuthList
 }
 
+func SetTNAuthList(tnAuth string) {
+	tnAuthList = tnAuth
+}
 
 func SetFingerprint(fp string) {
 	fingerPrint = "SHA256 " + fp

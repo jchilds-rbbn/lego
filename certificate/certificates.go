@@ -274,8 +274,8 @@ func (c *Certifier) getForCSR(domains []string, order acme.ExtendedOrder, bundle
 	}
 
 	timeout := c.options.Timeout
-	if c.options.Timeout <= (60 * time.Second) {
-		timeout = 60 * time.Second
+	if c.options.Timeout <= (150 * time.Second) {
+		timeout = 150 * time.Second
 	}
 
 	err = wait.For("certificate", timeout, timeout/60, func() (bool, error) {

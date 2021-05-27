@@ -156,6 +156,7 @@ func loginToSTIPA() (string, error) {
 
 	switch resp.StatusCode {
 	case 200:
+                if reflect.ValueOf(respMap["accessToken"]).IsValid() {
 		switch reflect.TypeOf(respMap["accessToken"]).Kind() {
 		case reflect.String:
 			accessToken := reflect.ValueOf(respMap["accessToken"]).String()
@@ -163,6 +164,8 @@ func loginToSTIPA() (string, error) {
 		default:
 			return "", fmt.Errorf("error - PUT %v response status - %v; accessToken is not a string", stiPaUrl, resp.StatusCode)
 		}
+        }
+                return "", fmt.Errorf("error - %v", string(dataBuffer))
 	default:
 		return "", fmt.Errorf("error - %v", string(dataBuffer))
 	}
@@ -177,7 +180,7 @@ func fetchSPCToken(accessToken string) (string, error) {
 			"tktype":      "TNAuthList",
 			"tkvalue":     tnAuthList,
 			"ca":          false,
-			"fingerprint": "SHA256 D3:AC:95:1E:7B:0A:01:42:A4:17:EB:AB:02:D7:99:EB:52:0A:F7:2C:F7:28:E3:22:0A:A2:58:4D:A0:31:5A:82",
+			"fingerprint": fingerPrint,
 		},
 	}
 

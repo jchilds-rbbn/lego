@@ -223,6 +223,7 @@ func fetchSPCToken(accessToken string) (string, error) {
 	//var crl string
 	switch resp.StatusCode {
 	case 200:
+                if reflect.ValueOf(respMap["token"]).IsValid(){
 		switch reflect.TypeOf(respMap["token"]).Kind() {
 		case reflect.String:
 			jwt = reflect.ValueOf(respMap["token"]).String()
@@ -237,6 +238,9 @@ func fetchSPCToken(accessToken string) (string, error) {
 		default:
 			return "", fmt.Errorf("error - PUT %v response status - %v; crl is not a string", stiPaUrl, resp.StatusCode)
 		}
+            }else{
+               return "", fmt.Errorf("error - %v", string(dataBuffer))
+            }
 		break
 
 	default:

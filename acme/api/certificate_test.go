@@ -96,7 +96,7 @@ func TestCertificateService_Get_issuerRelUp(t *testing.T) {
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	require.NoError(t, err, "Could not generate test key")
 
-	core, err := New(http.DefaultClient, "lego-test", apiURL+"/dir", "", key)
+	core, err := New(http.DefaultClient, "lego-test", apiURL+"/dir", "", key, "", "")
 	require.NoError(t, err)
 
 	cert, issuer, err := core.Certificates.Get(apiURL+"/certificate", true)
@@ -119,7 +119,7 @@ func TestCertificateService_Get_embeddedIssuer(t *testing.T) {
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	require.NoError(t, err, "Could not generate test key")
 
-	core, err := New(http.DefaultClient, "lego-test", apiURL+"/dir", "", key)
+	core, err := New(http.DefaultClient, "lego-test", apiURL+"/dir", "", key, "", "")
 	require.NoError(t, err)
 
 	cert, issuer, err := core.Certificates.Get(apiURL+"/certificate", true)

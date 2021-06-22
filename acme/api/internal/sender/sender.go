@@ -24,13 +24,17 @@ func contentType(ct string) RequestOption {
 type Doer struct {
 	httpClient *http.Client
 	userAgent  string
+	tenant     string
+	tenantKey  string
 }
 
 // NewDoer Creates a new Doer.
-func NewDoer(client *http.Client, userAgent string) *Doer {
+func NewDoer(client *http.Client, userAgent, varTenant, varTenantKey string) *Doer {
 	return &Doer{
 		httpClient: client,
 		userAgent:  userAgent,
+		tenant:     varTenant,
+		tenantKey:  varTenantKey,
 	}
 }
 
@@ -68,12 +72,18 @@ func (d *Doer) Post(url string, body io.Reader, bodyType string, response interf
 }
 
 func (d *Doer) newRequest(method, uri string, body io.Reader, opts ...RequestOption) (*http.Request, error) {
+	if d.tenant != "" {
+		uri = uri + "?tenant=" + d.tenant
+	}
 	req, err := http.NewRequest(method, uri, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	req.Header.Set("User-Agent", d.formatUserAgent())
+	if d.tenantKey != "" {
+		req.Header.Set("Authorization", d.tenantKey)
+	}
 
 	for _, opt := range opts {
 		err = opt(req)

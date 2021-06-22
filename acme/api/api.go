@@ -35,8 +35,8 @@ type Core struct {
 }
 
 // New Creates a new Core.
-func New(httpClient *http.Client, userAgent, caDirURL, kid string, privateKey crypto.PrivateKey) (*Core, error) {
-	doer := sender.NewDoer(httpClient, userAgent)
+func New(httpClient *http.Client, userAgent, caDirURL, kid string, privateKey crypto.PrivateKey, tenant, tenantKey string) (*Core, error) {
+	doer := sender.NewDoer(httpClient, userAgent, tenant, tenantKey)
 
 	dir, err := getDirectory(doer, caDirURL)
 	if err != nil {

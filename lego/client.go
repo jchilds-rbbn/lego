@@ -45,7 +45,7 @@ func NewClient(config *Config) (*Client, error) {
 		kid = reg.URI
 	}
 
-	core, err := api.New(config.HTTPClient, config.UserAgent, config.CADirURL, kid, privateKey)
+	core, err := api.New(config.HTTPClient, config.UserAgent, config.CADirURL, kid, privateKey, config.Tenant, config.TenantKey)
 	if err != nil {
 		return nil, err
 	}

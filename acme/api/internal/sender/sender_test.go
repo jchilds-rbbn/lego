@@ -18,7 +18,7 @@ func TestDo_UserAgentOnAllHTTPMethod(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	doer := NewDoer(http.DefaultClient, "")
+	doer := NewDoer(http.DefaultClient, "", "", "")
 
 	testCases := []struct {
 		method string
@@ -55,7 +55,7 @@ func TestDo_UserAgentOnAllHTTPMethod(t *testing.T) {
 
 func TestDo_CustomUserAgent(t *testing.T) {
 	customUA := "MyApp/1.2.3"
-	doer := NewDoer(http.DefaultClient, customUA)
+	doer := NewDoer(http.DefaultClient, customUA, "", "")
 
 	ua := doer.formatUserAgent()
 	assert.Contains(t, ua, ourUserAgent)

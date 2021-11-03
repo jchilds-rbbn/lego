@@ -40,8 +40,6 @@ type Config struct {
 	UserAgent   string
 	HTTPClient  *http.Client
 	Certificate CertificateConfig
-	Tenant      string
-	TenantKey   string
 }
 
 func NewConfig(user registration.User) *Config {

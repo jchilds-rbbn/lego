@@ -51,7 +51,7 @@ func TestOrderService_New(t *testing.T) {
 		}
 	})
 
-	core, err := New(http.DefaultClient, "lego-test", apiURL+"/dir", "", privateKey, "", "")
+	core, err := New(http.DefaultClient, "lego-test", apiURL+"/dir", "", privateKey)
 	require.NoError(t, err)
 
 	order, err := core.Orders.New([]string{"example.com"})

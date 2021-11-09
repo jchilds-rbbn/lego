@@ -137,5 +137,9 @@ func CreateFlags(defaultPath string) []cli.Flag {
 			Name:  "tkauth.SPC",
 			Usage: "SPC to include in STI-PA token request",
 		},
+		cli.StringFlag{
+			Name:  "tkauth.tnauthlist",
+			Usage: "TnAuthList for delegate certificate.  Should not be used for STIR/SHAKEN certs",
+		},
 	}
 }

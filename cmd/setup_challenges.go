@@ -133,20 +133,28 @@ func setupDNS(ctx *cli.Context, client *lego.Client) {
 
 func setupTkauth(ctx *cli.Context, client *lego.Client) {
 
-	if !ctx.GlobalIsSet("tkauth.stipa-user") {
-		log.Fatalf("tkauth.stipa-user not set.")
-	}
-	if !ctx.GlobalIsSet("tkauth.stipa-password") {
-		log.Fatalf("tkauth.stipa-password not set.")
-	}
-	if !ctx.GlobalIsSet("tkauth.SPC") {
-		log.Fatalf("tkauth.SPC not set.")
-	}
+	// We now have two types.  SPC based for STIR/SHAKEN and Delegate cert one which will not
+	// have any of these config options.  Do this based on if tkauth.tnauthlist is set
+	tnauthlist := ctx.GlobalString("tkauth.tnauthlist")
+	if tnauthlist == "" {
+		ctx.GlobalString("tkauth.stipa-user")
+		if !ctx.GlobalIsSet("tkauth.stipa-user") {
+			log.Warnf("tkauth.stipa-user not set.")
+		}
+		if !ctx.GlobalIsSet("tkauth.stipa-password") {
+			log.Warnf("tkauth.stipa-password not set.")
+		}
+		if !ctx.GlobalIsSet("tkauth.SPC") {
+			log.Warnf("tkauth.SPC not set.")
+		}
 
-	tkauth01.SetStiPaUser(ctx.GlobalString("tkauth.stipa-user"))
-	tkauth01.SetStiPaPassword(ctx.GlobalString("tkauth.stipa-password"))
-	tkauth01.SetStiPaUrl(ctx.GlobalString("tkauth.stipa"))
-	tkauth01.SetSPC(ctx.GlobalString("tkauth.SPC"))
+		tkauth01.SetStiPaUser(ctx.GlobalString("tkauth.stipa-user"))
+		tkauth01.SetStiPaPassword(ctx.GlobalString("tkauth.stipa-password"))
+		tkauth01.SetStiPaUrl(ctx.GlobalString("tkauth.stipa"))
+		tkauth01.SetSPC(ctx.GlobalString("tkauth.SPC"))
+	} else {
+		tkauth01.SetTNAuthList(tnauthlist)
+	}
 
 	err := client.Challenge.SetTkauthProvider()
 	if err != nil {

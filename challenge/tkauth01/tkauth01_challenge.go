@@ -68,7 +68,7 @@ func (c *Challenge) Solve(authz acme.Authorization) error {
 
 	log.Infof("Retrieved SPC token")
 
-	logOutofSTIPA(accessToken)
+	// logOutofSTIPA(accessToken)
 
 	return c.validate(c.core, spcToken, chlng)
 }
@@ -156,16 +156,16 @@ func loginToSTIPA() (string, error) {
 
 	switch resp.StatusCode {
 	case 200:
-                if reflect.ValueOf(respMap["accessToken"]).IsValid() {
-		switch reflect.TypeOf(respMap["accessToken"]).Kind() {
-		case reflect.String:
-			accessToken := reflect.ValueOf(respMap["accessToken"]).String()
-			return accessToken, nil
-		default:
-			return "", fmt.Errorf("error - PUT %v response status - %v; accessToken is not a string", stiPaUrl, resp.StatusCode)
+		if reflect.ValueOf(respMap["accessToken"]).IsValid() {
+			switch reflect.TypeOf(respMap["accessToken"]).Kind() {
+			case reflect.String:
+				accessToken := reflect.ValueOf(respMap["accessToken"]).String()
+				return accessToken, nil
+			default:
+				return "", fmt.Errorf("error - PUT %v response status - %v; accessToken is not a string", stiPaUrl, resp.StatusCode)
+			}
 		}
-        }
-                return "", fmt.Errorf("error - %v", string(dataBuffer))
+		return "", fmt.Errorf("error - %v", string(dataBuffer))
 	default:
 		return "", fmt.Errorf("error - %v", string(dataBuffer))
 	}
@@ -223,24 +223,24 @@ func fetchSPCToken(accessToken string) (string, error) {
 	//var crl string
 	switch resp.StatusCode {
 	case 200:
-                if reflect.ValueOf(respMap["token"]).IsValid(){
-		switch reflect.TypeOf(respMap["token"]).Kind() {
-		case reflect.String:
-			jwt = reflect.ValueOf(respMap["token"]).String()
-			break
-		default:
-			return "", fmt.Errorf("error - PUT %v response status - %v; accessToken is not a string", stiPaUrl, resp.StatusCode)
+		if reflect.ValueOf(respMap["token"]).IsValid() {
+			switch reflect.TypeOf(respMap["token"]).Kind() {
+			case reflect.String:
+				jwt = reflect.ValueOf(respMap["token"]).String()
+				break
+			default:
+				return "", fmt.Errorf("error - PUT %v response status - %v; accessToken is not a string", stiPaUrl, resp.StatusCode)
+			}
+			switch reflect.TypeOf(respMap["crl"]).Kind() {
+			case reflect.String:
+				//crl = reflect.ValueOf(respMap["crl"]).String()
+				break
+			default:
+				return "", fmt.Errorf("error - PUT %v response status - %v; crl is not a string", stiPaUrl, resp.StatusCode)
+			}
+		} else {
+			return "", fmt.Errorf("error - %v", string(dataBuffer))
 		}
-		switch reflect.TypeOf(respMap["crl"]).Kind() {
-		case reflect.String:
-			//crl = reflect.ValueOf(respMap["crl"]).String()
-			break
-		default:
-			return "", fmt.Errorf("error - PUT %v response status - %v; crl is not a string", stiPaUrl, resp.StatusCode)
-		}
-            }else{
-               return "", fmt.Errorf("error - %v", string(dataBuffer))
-            }
 		break
 
 	default:

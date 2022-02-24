@@ -39,6 +39,17 @@ func main() {
 
 	app.Commands = cmd.CreateCommands()
 
+	// RBBN HACK TO ALWAYS WORK WITH OUR STI-CA.  Stuff like this will cause us
+	// to not be able to merge back into the mainline, but that seems unlikely
+	// now at any rate.  Especially if we can't get our STI-CA to accept json+jose
+	// A little weird looking because arg[0] must be executable name and the exact
+	// last arg must be the command
+	command := os.Args[len(os.Args)-1]
+	os.Args[len(os.Args)-1] = "--eab"
+	os.Args = append(os.Args, "--tkauth")
+	os.Args = append(os.Args, "--accept-tos")
+	os.Args = append(os.Args, command)
+
 	err = app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)

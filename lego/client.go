@@ -7,6 +7,7 @@ import (
 	"github.com/go-acme/lego/v4/acme/api"
 	"github.com/go-acme/lego/v4/certificate"
 	"github.com/go-acme/lego/v4/challenge/resolver"
+	"github.com/go-acme/lego/v4/challenge/tkauth01"
 	"github.com/go-acme/lego/v4/registration"
 )
 
@@ -49,6 +50,9 @@ func NewClient(config *Config) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// We need a better way to do this for tkauth....
+	tkauth01.SetFingerprintFromPrivateKey(privateKey)
 
 	solversManager := resolver.NewSolversManager(core)
 

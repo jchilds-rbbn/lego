@@ -2,6 +2,9 @@ package tkauth01
 
 import (
 	"bytes"
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"encoding/asn1"
 	"encoding/base64"
 	"encoding/json"
@@ -15,6 +18,7 @@ import (
 	"github.com/go-acme/lego/v4/acme/api"
 	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/log"
+	"github.com/square/go-jose"
 )
 
 var stiPaUrl string
@@ -291,4 +295,35 @@ func spcToTnAuth(spc string) string {
 		return ""
 	}
 	return base64.StdEncoding.EncodeToString(mdata)
+}
+
+func SetFingerprintFromPrivateKey(privateKey crypto.PrivateKey) error {
+
+	fmt.Printf("SetFingerprintFromPrivateKey: setting fingerprint\n")
+
+	var publicKey crypto.PublicKey
+	switch k := privateKey.(type) {
+	case *ecdsa.PrivateKey:
+		publicKey = k.Public()
+	case *rsa.PrivateKey:
+		publicKey = k.Public()
+	}
+
+	jwk := jose.JSONWebKey{Key: publicKey}
+	fpBytes, err := jwk.Thumbprint(crypto.SHA256)
+	if err != nil {
+		return err
+	}
+
+	fingerPrint := fmt.Sprintf("%x", fpBytes)
+	// after every two characters insert a colon(:)
+	for index := 2; index < len(fingerPrint); index += 3 {
+		fingerPrint = fingerPrint[:index] + ":" + fingerPrint[index:]
+	}
+
+	fmt.Printf("fingerprint = %v\n", fingerPrint)
+
+	SetFingerprint(fingerPrint)
+
+	return nil
 }

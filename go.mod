@@ -41,6 +41,7 @@ require (
 	github.com/pquerna/otp v1.3.0
 	github.com/rainycape/memcache v0.0.0-20150622160815-1031fa0ce2f2
 	github.com/sacloud/libsacloud v1.36.2
+	github.com/square/go-jose v2.6.0+incompatible
 	github.com/stretchr/testify v1.7.0
 	github.com/transip/gotransip/v6 v6.2.0
 	github.com/urfave/cli v1.22.4

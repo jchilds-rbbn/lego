@@ -23,6 +23,7 @@ func CreateFlags(defaultPath string) []cli.Flag {
 		cli.StringFlag{
 			Name:  "email, m",
 			Usage: "Email used for registration and recovery contact.",
+			Value: "rbbn-kms@rbbn.com",
 		},
 		cli.StringFlag{
 			Name:  "csr, c",
@@ -39,6 +40,7 @@ func CreateFlags(defaultPath string) []cli.Flag {
 		cli.StringFlag{
 			Name:  "hmac",
 			Usage: "MAC key from External CA. Should be in Base64 URL Encoding without padding format. Used for External Account Binding.",
+			Value: "bXktc2VjcmV0LWtleQo",
 		},
 		cli.StringFlag{
 			Name:  "key-type, k",

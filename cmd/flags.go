@@ -143,5 +143,22 @@ func CreateFlags(defaultPath string) []cli.Flag {
 			Name:  "tkauth.tnauthlist",
 			Usage: "TnAuthList for delegate certificate.  Should not be used for STIR/SHAKEN certs",
 		},
+		cli.StringFlag{
+			Name:  "tenant",
+			Usage: "Tenant id for Ribbon STI-CA",
+		},
+		cli.StringFlag{
+			Name:  "tenant-key",
+			Usage: "Tenant API key id for Ribbon STI-CA",
+		},
+		cli.StringFlag{
+			Name:  "profile",
+			Usage: "profile name on Ribbon STI-CA to use for certificate generation",
+		},
+		cli.StringFlag{
+			Name:  "stica",
+			Value: "2107",
+			Usage: "Version of Ribbon STI-CA api to use",
+		},
 	}
 }

@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"bufio"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -12,6 +14,13 @@ import (
 	"github.com/go-acme/lego/v4/registration"
 	"github.com/urfave/cli"
 )
+
+type RibbonKid struct {
+	Tenant      string `json:"Tenant,omitempty"`
+	ProxyTenant string `json:"ProxyTenant,omitempty"`
+	TenantKey   string `json:"TenantKey,omitempty"`
+	CaProfileId string `json:"CaProfileId,omitempty"`
+}
 
 func createRun() cli.Command {
 	return cli.Command{
@@ -140,7 +149,30 @@ func register(ctx *cli.Context, client *lego.Client) (*registration.Resource, er
 	}
 
 	if ctx.GlobalBool("eab") {
-		kid := ctx.GlobalString("kid")
+		var kid string
+		tenant := ctx.GlobalString("tenant")
+		apikey := ctx.GlobalString("tenant-key")
+		profile := ctx.GlobalString("profile")
+		stica := ctx.GlobalString("stica")
+
+		if tenant == "" || apikey == "" {
+			log.Fatalf("Requires arguments --tenant and --tenant-key.")
+		}
+		if stica == "2107" { // kind of a hack but we only need it for backwards compatibility
+			kid = tenant + "::" + apikey
+		} else {
+			// The new way uses json body base65 encoded to pass all the parameters.
+			fmt.Printf("Using profile %s\n", profile)
+			kidJson := RibbonKid{Tenant: tenant, TenantKey: apikey, CaProfileId: profile}
+			kidBytes, err := json.Marshal(kidJson)
+			if err != nil {
+				log.Fatalf("Can't Marshall kid for EAB")
+			}
+			kid = base64.URLEncoding.EncodeToString(kidBytes)
+		}
+		// XXX DEBUG only should be removed
+		fmt.Printf("kid = %s\n", kid)
+
 		hmacEncoded := ctx.GlobalString("hmac")
 
 		if kid == "" || hmacEncoded == "" {

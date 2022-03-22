@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/go-acme/lego/v4/certificate"
+	"github.com/go-acme/lego/v4/challenge/tkauth01"
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/log"
 	"github.com/go-acme/lego/v4/registration"
@@ -77,6 +78,12 @@ func run(ctx *cli.Context) error {
 
 	account, client := setup(ctx, accountsStorage)
 	setupChallenges(ctx, client)
+
+	// Ribbon hack.  Make sure we can get the SPC Token before continuing.
+	spcToken := tkauth01.GetSPCTokenString()
+	if spcToken == "" {
+		log.Fatalf("Could not retrieve SPC token\n\t")
+	}
 
 	if account.Registration == nil {
 		reg, err := register(ctx, client)

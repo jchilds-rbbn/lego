@@ -117,6 +117,10 @@ func SetFingerprint(fp string) {
 	fingerPrint = "SHA256 " + fp
 }
 
+func GetSPCTokenString() string {
+	return spcToken
+}
+
 // loginToSTIPA //logs in to the STI PA and returns the access token
 func loginToSTIPA() (string, error) {
 	//url := configurationInstance.URL

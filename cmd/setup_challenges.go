@@ -161,6 +161,13 @@ func setupTkauth(ctx *cli.Context, client *lego.Client) {
 		log.Println("Error create Tkauth Provider ", err)
 	}
 
+	// Retrieve SPC Token before we start to make sure username/password is good before
+	// we start with the ACME negotiations.
+	err = tkauth01.GetSPCToken()
+	if err != nil {
+		log.Println("Could not retrieve SPC Token ", err)
+	}
+
 	log.Println("Using tkauth challenge")
 
 }

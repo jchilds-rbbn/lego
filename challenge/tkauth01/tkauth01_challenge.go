@@ -27,6 +27,7 @@ var stiPaPassword string
 var spc string
 var tnAuthList string
 var fingerPrint string
+var spcToken string
 
 type ValidateFunc func(core *api.Core, domain string, chlng acme.Challenge) error
 
@@ -58,22 +59,26 @@ func (c *Challenge) Solve(authz acme.Authorization) error {
 		return err
 	}
 
-	// Here we need to go get the service provider token for authentication
-	accessToken, err := loginToSTIPA()
-	if err != nil {
-		log.Infof("Could not log into STI-PA err %v", err)
-		return err
-	}
-	spcToken, err := fetchSPCToken(accessToken)
-	if err != nil {
-		log.Infof("Could not log fetch SPC token err %v", err)
-		return err
-	}
+	// XXX This is now taken care of earlier and the SPC Token should be saved.  This should
+	// cause us to not fail because of username/password errors causing a long delay
+	// in issuing certificates.
 
-	log.Infof("Retrieved SPC token")
+	/* 	// Here we need to go get the service provider token for authentication
+	   	accessToken, err := loginToSTIPA()
+	   	if err != nil {
+	   		log.Infof("Could not log into STI-PA err %v", err)
+	   		return err
+	   	}
+	   	spcToken, err := fetchSPCToken(accessToken)
+	   	if err != nil {
+	   		log.Infof("Could not log fetch SPC token err %v", err)
+	   		return err
+	   	}
 
-	// logOutofSTIPA(accessToken)
+	   	log.Infof("Retrieved SPC token")
 
+	   	// logOutofSTIPA(accessToken)
+	*/
 	return c.validate(c.core, spcToken, chlng)
 }
 
@@ -324,6 +329,28 @@ func SetFingerprintFromPrivateKey(privateKey crypto.PrivateKey) error {
 	fmt.Printf("fingerprint = %v\n", fingerPrint)
 
 	SetFingerprint(fingerPrint)
+
+	return nil
+}
+
+func GetSPCToken() error {
+
+	fmt.Printf("GetSPCToken: attempting to retrieve SPC Token\n")
+
+	accessToken, err := loginToSTIPA()
+	if err != nil {
+		log.Infof("Could not log into STI-PA err %v", err)
+		return err
+	}
+	token, err := fetchSPCToken(accessToken)
+	if err != nil {
+		log.Infof("Could not log fetch SPC token err %v", err)
+		return err
+	}
+
+	spcToken = token
+
+	log.Infof("Retrieved SPC token")
 
 	return nil
 }

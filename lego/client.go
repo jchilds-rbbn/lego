@@ -36,6 +36,10 @@ func NewClient(config *Config) (*Client, error) {
 		return nil, errors.New("the HTTP client cannot be nil")
 	}
 
+	// This is a bad hack, but all our code is not really setup to use the whole
+	// lego.api type of structure, so just save this for future reference.
+	tkauth01.SetClient(config.HTTPClient)
+
 	privateKey := config.User.GetPrivateKey()
 	if privateKey == nil {
 		return nil, errors.New("private key was nil")

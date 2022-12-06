@@ -160,5 +160,9 @@ func CreateFlags(defaultPath string) []cli.Flag {
 			Value: "2107",
 			Usage: "Version of Ribbon STI-CA api to use",
 		},
+		cli.StringFlag{
+			Name:  "tkauth.sti-participant-id",
+			Usage: "STI-PA participant id",
+		},
 	}
 }

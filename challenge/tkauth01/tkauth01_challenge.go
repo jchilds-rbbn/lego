@@ -29,6 +29,7 @@ var tnAuthList string
 var fingerPrint string
 var spcToken string
 var httpClient *http.Client
+var stiParticipantId string
 
 type ValidateFunc func(core *api.Core, domain string, chlng acme.Challenge) error
 
@@ -126,6 +127,14 @@ func SetClient(client *http.Client) {
 	httpClient = client
 }
 
+func SetParticipantId(id string) {
+	stiParticipantId = id
+}
+
+func GetParticipantId() string {
+	return (stiParticipantId)
+}
+
 // loginToSTIPA //logs in to the STI PA and returns the access token
 func loginToSTIPA() (string, error) {
 	//url := configurationInstance.URL
@@ -192,7 +201,11 @@ func loginToSTIPA() (string, error) {
 func fetchSPCToken(accessToken string) (string, error) {
 	client := httpClient
 	//cURL := url + "/api/v1/ca-list"
-	cURL := stiPaUrl + "/api/v1/account/" + spc + "/token"
+	participantId := GetParticipantId()
+	if participantId == "" {
+		participantId = spc
+	}
+	cURL := stiPaUrl + "/api/v1/account/" + participantId + "/token"
 	verifyBody := map[string]interface{}{
 		"atc": map[string]interface{}{
 			"tktype":      "TNAuthList",

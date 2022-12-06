@@ -152,6 +152,12 @@ func setupTkauth(ctx *cli.Context, client *lego.Client) {
 		tkauth01.SetStiPaPassword(ctx.GlobalString("tkauth.stipa-password"))
 		tkauth01.SetStiPaUrl(ctx.GlobalString("tkauth.stipa"))
 		tkauth01.SetSPC(ctx.GlobalString("tkauth.SPC"))
+
+		if ctx.GlobalIsSet("tkauth.sti-participant-id") {
+			log.Println("Setting participant id to", ctx.GlobalString("tkauth.sti-participant-id"))
+			tkauth01.SetParticipantId(ctx.GlobalString("tkauth.sti-participant-id"))
+		}
+
 	} else {
 		tkauth01.SetTNAuthList(tnauthlist)
 	}

@@ -8,11 +8,13 @@ import (
 	"encoding/asn1"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/go-acme/lego/v4/acme"
 	"github.com/go-acme/lego/v4/acme/api"
@@ -372,7 +374,134 @@ func GetSPCToken() error {
 
 	spcToken = token
 
+	// Validate  the token now.  This is not strictly necessary but will stop a lot of STI-CA activity
+	// and a potentially confusing error message if  the certificate it no good.const
+	if err = sanityCheckToken(spcToken); err != nil {
+		log.Infof("Could not sanityCheck SPC token err %v", err)
+		return err
+	}
+
 	log.Infof("Retrieved SPC token")
 
 	return nil
+}
+func sanityCheckToken(jwtToken string) error {
+	// check if the JWT token has 3 mandatory parts, splitted by .
+	subString := strings.Split(jwtToken, ".")
+	if len(subString) != 3 {
+		err := errors.New("Received Token is invalid - Token doesn't have all all 3 mandatory fields")
+		log.Infof("Error = %v", err)
+		return err
+	}
+
+	header, err := base64Decode(subString[0])
+	if err != nil {
+		err = fmt.Errorf("Unable to Decode JWT Token's Header, Error: %v", err)
+		log.Infof("Error = %v", err)
+		return err
+	}
+
+	respMapOfHeader := make(map[string]string)
+	if err = json.Unmarshal(header, &respMapOfHeader); err != nil {
+		err = fmt.Errorf("Unable to Unmarshal Header, Error: %v", err)
+		log.Infof("Error = %v", err)
+		return err
+	}
+	if respMapOfHeader["typ"] != "JWT" {
+		err = errors.New("Received Token is invalid - 'typ' is of not type JWT")
+		log.Infof("Error = %v", err)
+		return err
+	}
+	if respMapOfHeader["x5u"] == "" {
+		err = errors.New("Received Token is invalid - 'x5u' is of not type blank")
+		log.Infof("Error = %v", err)
+		return err
+	}
+	// validate payload starts from here
+	payload, err := base64Decode(subString[1])
+	if err != nil {
+		err = fmt.Errorf("Unable to Decode JWT Token's Payload, Error: %v", err)
+		log.Infof("Error = %v", err)
+		return err
+	}
+
+	respMapOfPayload := make(map[string]interface{})
+	if err := json.Unmarshal(payload, &respMapOfPayload); err != nil {
+		err = fmt.Errorf("Unable to Unmarshal Payload, Error: %v", err)
+		log.Infof("Error = %v", err)
+		return err
+	}
+
+	if respMapOfPayload["exp"] == "" {
+		err = fmt.Errorf("Received Token is invalid - 'exp' is blank")
+		log.Infof("Error = %v", err)
+		return err
+	}
+	if respMapOfPayload["jti"] == "" {
+		err = fmt.Errorf("Received Token is invalid - 'jti' is blank")
+		log.Infof("Error = %v", err)
+		return err
+	}
+	if respMapOfPayload["atc"] == "" {
+		err = fmt.Errorf("Received Token is invalid - 'atc' is blank")
+		log.Infof("Error = %v", err)
+		return err
+	}
+
+	now := time.Now().Unix()
+	switch reflect.TypeOf(respMapOfPayload["exp"]).Kind() {
+	case reflect.Float64:
+		expireTime := int64(reflect.ValueOf(respMapOfPayload["exp"]).Float())
+		if now > expireTime {
+			err = fmt.Errorf("Received Token is invalid - it has expired")
+			log.Infof("Error = %v", err)
+			return err
+		}
+	default:
+		err = fmt.Errorf("Received Token is invalid - it has invalid expire time")
+		log.Infof("Error = %v", err)
+		return err
+	}
+	switch reflect.TypeOf(respMapOfPayload["atc"]).Kind() {
+	case reflect.Map:
+		tktype := reflect.ValueOf(respMapOfPayload["atc"].(map[string]interface{})["tktype"]).String()
+		if tktype != "TNAuthList" {
+			err = fmt.Errorf("Received Token is invalid - 'tktype' is not equal to 'TNAuthList'")
+			log.Infof("Error = %v", err)
+			return err
+		}
+		tkvalue := reflect.ValueOf(respMapOfPayload["atc"].(map[string]interface{})["tkvalue"]).String()
+		if tkvalue == "" {
+			err = fmt.Errorf("Received Token is invalid - 'tkvalue' is blank")
+			log.Infof("Error = %v", err)
+			return err
+		}
+
+		fingerprint := reflect.ValueOf(respMapOfPayload["atc"].(map[string]interface{})["fingerprint"]).String()
+		if fingerprint == "" {
+			err = fmt.Errorf("Received Token is invalid - 'fingerprint' is blank")
+			log.Infof("Error = %v", err)
+			return err
+		}
+	default:
+		err = fmt.Errorf("Received Token is invalid - it has invalid atc value")
+		log.Infof("Error = %v", err)
+		return err
+	}
+	log.Infof("Received Token is valid proceeding")
+	return nil
+
+}
+
+func base64Decode(sig string) ([]byte, error) {
+	// add back missing padding
+	switch len(sig) % 4 {
+	case 1:
+		sig += "==="
+	case 2:
+		sig += "=="
+	case 3:
+		sig += "="
+	}
+	return base64.URLEncoding.DecodeString(sig)
 }

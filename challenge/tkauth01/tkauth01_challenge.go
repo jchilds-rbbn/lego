@@ -32,6 +32,7 @@ var fingerPrint string
 var spcToken string
 var httpClient *http.Client
 var stiParticipantId string
+var crlFromPA string
 
 type ValidateFunc func(core *api.Core, domain string, chlng acme.Challenge) error
 
@@ -135,6 +136,10 @@ func SetParticipantId(id string) {
 
 func GetParticipantId() string {
 	return (stiParticipantId)
+}
+
+func GetCrlFromPA() string {
+	return crlFromPA
 }
 
 // loginToSTIPA //logs in to the STI PA and returns the access token
@@ -266,7 +271,8 @@ func fetchSPCToken(accessToken string) (string, error) {
 			}
 			switch reflect.TypeOf(respMap["crl"]).Kind() {
 			case reflect.String:
-				//crl = reflect.ValueOf(respMap["crl"]).String()
+				crlFromPA = reflect.ValueOf(respMap["crl"]).String()
+				log.Infof("CRL from PA is %v", crlFromPA)
 				break
 			default:
 				return "", fmt.Errorf("error - PUT %v response status - %v; crl is not a string", stiPaUrl, resp.StatusCode)
@@ -361,6 +367,9 @@ func GetSPCToken() error {
 
 	fmt.Printf("GetSPCToken: attempting to retrieve SPC Token\n")
 
+	// Reset in case it fails during processing so we don't have stale data
+	spcToken = ""
+	crlFromPA = ""
 	accessToken, err := loginToSTIPA()
 	if err != nil {
 		log.Infof("Could not log into STI-PA err %v", err)

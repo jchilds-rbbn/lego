@@ -20,7 +20,7 @@ import (
 	"github.com/go-acme/lego/v4/acme/api"
 	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/log"
-	"github.com/square/go-jose"
+	"github.com/go-jose/go-jose/v4"
 )
 
 var stiPaUrl string
